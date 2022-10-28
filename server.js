@@ -5,6 +5,9 @@ require("dotenv").config();
 const assert = require("assert");
 const fileUpload = require("express-fileupload");
 const { StatusCodes } = require("http-status-codes");
+
+const connectDB = require("./db");
+
 const port = process.env.PORT;
 
 const app = express();
@@ -28,11 +31,12 @@ app.use(`/api/v1/user`, userRoute);
 
 const start = async () => {
   try {
+    await connectDB();
     app.listen(port, () => {
       console.log(`Server started running in port ${port}`);
     });
   } catch (error) {
-    return resizeBy
+    return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ msg: error.message });
   }

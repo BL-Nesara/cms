@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(cors());
-app.use(cookieParser());
+app.use(cookieParser(process.env.TOKEN_SECRET)); //add token only for signed cookies
 app.use(
   fileUpload({
     useTempFiles: true,

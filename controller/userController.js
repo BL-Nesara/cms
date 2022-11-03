@@ -3,8 +3,11 @@ const User = require("../model/userModel");
 const userController = {
   getAll: async (req, res) => {
     try {
-      const users = await User.find({});
-      res.json({ users, length: users.length });
+      const users = await User.find({}).select("-password");
+
+      const filterdUsers = users.filter((item) => item.role !== "superadmin");
+
+      res.json({ users: filterdUsers, length: filterdUsers.length });
     } catch (error) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -13,7 +16,9 @@ const userController = {
   },
   getCurrentUser: async (req, res) => {
     try {
-      res.json({ msg: "get login user info" });
+      const id = req.user.id;
+      const user = await User.findById({ _id: id });
+      res.json({ user });
     } catch (error) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -22,7 +27,12 @@ const userController = {
   },
   updateUser: async (req, res) => {
     try {
-      res.json({ msg: "update user info" });
+      const { name, mobile, image } = req.body;
+      await User.findByIdAndUpdate(
+        { _id: req.user.id },
+        { name, mobile, image }
+      );
+      res.status(StatusCodes.OK).json({ msg: "update user info" });
     } catch (error) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -31,7 +41,9 @@ const userController = {
   },
   deleteUser: async (req, res) => {
     try {
-      res.json({ msg: "delete user" });
+      const id = req.params.id;
+      await User.findByIdAndDelete({ _id: id });
+      res.json({ msg: "user data deleted successfully" });
     } catch (error) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -40,7 +52,10 @@ const userController = {
   },
   changeRole: async (req, res) => {
     try {
-      res.json({ msg: "change user role" });
+      const id = req.params.id;
+      const { role } = req.body;
+      await User.findByIdAndUpdate({ _id }, { role });
+      res.json({ msg: "Role updated successfully" });
     } catch (error) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)

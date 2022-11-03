@@ -1,17 +1,17 @@
 const { StatusCodes } = require("http-status-codes");
 const User = require("../model/userModel");
 
-const adminAuth = async (req, res, next) => {
+const userAuth = async (req, res, next) => {
   try {
     //  res.json({ adminAuth: req.user });
     const id = req.user.id;
     const extUser = await User.findById({ _id: id });
 
     //validate role
-    if (extUser.role !== "superadmin")
+    if (extUser.role === "superadmin")
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ msg: "Access denied for non-admin users" });
+        .json({ msg: "Update restricted for admin" });
 
     next();
   } catch (error) {
@@ -21,4 +21,4 @@ const adminAuth = async (req, res, next) => {
   }
 };
 
-module.exports = adminAuth;
+module.exports = userAuth;
